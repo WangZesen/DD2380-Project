@@ -75,12 +75,12 @@ class Obstacle {
 
 		bool isIn(int testX, int testY) {
 			switch (kind) {
-				case 0: {
+				case 1: {
 					if ((testX - x) * (testX - x) + (testY - y) * (testY - y) <= r * r)
 						return true;
 					return false;
 				}
-				case 1: {
+				case 0: {
 					if ((abs(testX - x) < a / 2.0) && (abs(testY - y) < b / 2.0)) 
 						return true;
 					return false;
@@ -132,7 +132,25 @@ class Environment {
 
 		// Return map in string
 		std::string mapToString() {
-
+			std::string output;
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
+					switch (this->at(i, j)) {
+						case 0:
+							break;
+						case 1:
+							break;
+						case 2:
+							output += '#';
+							break;
+						case 3:
+							output += '.';
+							break;
+					}
+				}
+				output += '\n';
+			}
+			return output;
 		}
 
 		// Return map information
