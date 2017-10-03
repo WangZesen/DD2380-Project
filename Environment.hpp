@@ -9,34 +9,24 @@
 
 class VectorPoint {
 	private:
-		double x, y;
+		
 		double length() const {
 			return (x * x + y * y);
 		}
 	public:
-		void info() {
-			std::cerr << "[Debug] x = " << x << ", y = " << y << std::endl;
-		}
-		VectorPoint(double initX, double initY) {
-			x = initX;
-			y = initY;
-		}
-		VectorPoint operator-(const VectorPoint &c) const {
-			return VectorPoint(x - c.x, y - c.y);
-		}
-		double operator*(const VectorPoint &c) const {
-			return (x * c.x + y * c.y);
-		}
-		double cosin(const VectorPoint &c) {
-			return (VectorPoint(x, y) * c) / this->length() / c.length();
-		}
-		VectorPoint calAngle(double angle, double dist) {
-			return VectorPoint(x + dist * sin(angle * PI / 180.0), y + dist * cos(angle * PI / 180.0));
-		}
+		double x, y;
+		void info();
+		VectorPoint(double initX, double initY);
+		VectorPoint operator-(const VectorPoint &c) const;
+		VectorPoint operator+(const VectorPoint &c) const;
+		double operator*(const VectorPoint &c) const;
+		double cosin(const VectorPoint &c);
+		VectorPoint calAngle(double angle, double dist);
+		//std::vector<VectorPoint> nextPropagate(const Environment& env, const VectorPoint& pre, double dist);
 };
 
 class Obstacle {
-	private:
+	public:
 		int x, y, kind, r, a, b;
 
 	public:
@@ -51,131 +41,38 @@ class Obstacle {
 		//error: expected initializer before ‘switch’
 		// 1 = circle
 
-		Obstacle() {
-			x = y = kind = r = a = b = 0;
-		}
+		Obstacle();
 
-		Obstacle(int X, int Y, int Kind, int R, int A, int B) {
-			x = X;
-			y = Y;
-			kind = Kind;
-			r = R;
-			a = A;
-			b = B;
-		}
+		Obstacle(int X, int Y, int Kind, int R, int A, int B);
 
-		void set(int X, int Y, int Kind, int R, int A, int B) {
-			x = X;
-			y = Y;
-			kind = Kind;
-			r = R;
-			a = A;
-			b = B;
-		}
+		void set(int X, int Y, int Kind, int R, int A, int B);
 
-		bool isIn(int testX, int testY) {
-			switch (kind) {
-				case 1: {
-					if ((testX - x) * (testX - x) + (testY - y) * (testY - y) <= r * r)
-						return true;
-					return false;
-				}
-				case 0: {
-					if ((abs(testX - x) < a / 2.0) && (abs(testY - y) < b / 2.0)) 
-						return true;
-					return false;
-				}
-			}
-		}
+		bool isIn(int testX, int testY);
 };
 
 class Environment {
 	public:
 		// initial a map
-		Environment() {
-		
-			VectorPoint x(1, 2);
-			x.calAngle(150, 2).info();
-		
-			srand((unsigned int) time(NULL));
-			for (int i = 0; i < numObstacles; i++) {
-				switch (rand() % 2) {
-					case 0: {
-						Obstacle temp(rand() % height, rand() % width, 0, 0, rand() % (height / 10) + 10, rand() % (height / 10) + 10);
-						obstacles.push_back(temp);
-						break;
-					}
-					case 1: {
-						Obstacle temp(rand() % height, rand() % width, 1, rand() % (height / 10) + 10, 0, 0);
-						obstacles.push_back(temp);
-						break;
-					}
-				}
-			}
-
-			for (int i = 0; i < height; i++) {
-				for (int j = 0; j < width; j++) {
-					bool within = false;
-					for (int k = 0; k < numObstacles; k++) 
-						within = within || obstacles[k].isIn(i, j);
-					switch ((int) within) {
-						case 1: 
-							Map[i][j] = 2;
-							break;
-						case 0:
-							Map[i][j] = 3;
-							break;
-					}
-				}
-			}
-		}
+		Environment();
 
 		// Return map in string
-		std::string mapToString() {
-			std::string output;
-			for (int i = 0; i < height; i++) {
-				for (int j = 0; j < width; j++) {
-					switch (this->at(i, j)) {
-						case 0:
-							break;
-						case 1:
-							break;
-						case 2:
-							output += '#';
-							break;
-						case 3:
-							output += '.';
-							break;
-					}
-				}
-				output += '\n';
-			}
-			return output;
-		}
+		std::string mapToString();
 
 		// Return map information
-		std::string mapInfo() {
-
-		}
+		void mapInfo();
 
 		// Return the circustance on point (x, y)
 		// 0 = start area
 		// 1 = goal area
 		// 2 = obstacle
 		// 3 = empty
-		int at(double x, double y) {
-			return Map[(int) round(x)][(int) round(y)];
-		}
-		int at(int x, int y) {
-			if (0 <= x && x < height && 0 <= y && y < height)
-				return Map[x][y];
-			else 
-				return -1;
-		}
+		int at(double x, double y);
+		int at(int x, int y);
+		int at(VectorPoint &c);
+		
 		
 		// Return possible successor
-		std::vector<int> test() {
-		}
+		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
 		
 
 
