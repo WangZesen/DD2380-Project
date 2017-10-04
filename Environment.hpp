@@ -8,21 +8,35 @@
 #define PI 3.14159265359
 
 class VectorPoint {
-	private:
 		
-		double length() const {
-			return (x * x + y * y);
-		}
-	public:
+	public: 
+		//	      90
+		//         |
+		//         |
+		// 180------------0(360)
+		//         |
+		//         |
+		//        270 
+		double length() const;
 		double x, y;
 		void info();
 		VectorPoint(double initX, double initY);
+		
+		// Substraction of two point gives a vector
 		VectorPoint operator-(const VectorPoint &c) const;
+		
+		// Addition of two vectors gives the combination of them
 		VectorPoint operator+(const VectorPoint &c) const;
+
+		// Dot product of two vectors
 		double operator*(const VectorPoint &c) const;
+		
+		// Cosin value of the angle between two vectors
 		double cosin(const VectorPoint &c);
-		VectorPoint calAngle(double angle, double dist);
-		//std::vector<VectorPoint> nextPropagate(const Environment& env, const VectorPoint& pre, double dist);
+		
+		// Gives a vector with angle and dist
+		VectorPoint calAngle(double angle, double dist) const;
+		
 };
 
 class Obstacle {
@@ -68,13 +82,12 @@ class Environment {
 		// 3 = empty
 		int at(double x, double y);
 		int at(int x, int y);
-		int at(VectorPoint &c);
-		
-		
-		// Return possible successor
-		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
-		
+		int at(VectorPoint c);
 
+		// Return possible successor
+		// Param x, y: present a vector from y to x
+		// Param dist: propagation distance
+		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
 
 	private:
 		const int width = 500;

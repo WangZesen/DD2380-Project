@@ -2,6 +2,10 @@
 
 // VectorPoint
 
+double VectorPoint::length() const {
+	return (x * x + y * y);
+}
+
 void VectorPoint::info() {
 	std::cerr << "[Debug] x = " << x << ", y = " << y << std::endl;
 }
@@ -27,8 +31,8 @@ double VectorPoint::cosin(const VectorPoint &c) {
 	return (VectorPoint(x, y) * c) / this->length() / c.length();
 }
 
-VectorPoint VectorPoint::calAngle(double angle, double dist) {
-	return VectorPoint(x + dist * sin(angle * PI / 180.0), y + dist * cos(angle * PI / 180.0));
+VectorPoint VectorPoint::calAngle(double angle, double dist) const {
+	return VectorPoint(dist * sin(angle * PI / 180.0), dist * cos(angle * PI / 180.0));
 }
 
 
@@ -74,8 +78,8 @@ bool Obstacle::isIn(int testX, int testY) {
 // Environment
 
 Environment::Environment() {
-	VectorPoint x(1, 2);
-	x.calAngle(150, 2).info();
+	//VectorPoint x(1, 2);
+	//x.calAngle(150, 2).info();
 
 	srand((unsigned int) time(NULL));
 	for (int i = 0; i < numObstacles; i++) {
@@ -92,20 +96,34 @@ Environment::Environment() {
 			}
 		}
 	}
+	
+	Obstacle temp(20, 20, 0, 0, 20, 20);
+	obstacles.push_back(temp);
+	temp.set(height - 20, width - 20, 0, 0, 20, 20);
+	obstacles.push_back(temp);
+	
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			bool within = false;
-			for (int k = 0; k < numObstacles; k++) {
-				within = within || obstacles[k].isIn(i, j);
+			int within = 4;
+			for (int k = 0; k < numObstacles + 2; k++) {
+				if ((obstacles[k].isIn(i, j)) && (within > obstacles[k].kind)) {
+					within = obstacles[k].kind;
+				}
 			}
 			
-			switch ((int) within) {
-				case 1: 
+			switch (within) {
+				case 0: 
+					Map[i][j] = 0;
+					break;
+				case 1:
+					Map[i][j] = 1;
+					break;
+				case 2:
 					Map[i][j] = 2;
-					break;
-				case 0:
+					break;				
+				case 3:
 					Map[i][j] = 3;
-					break;
+					break;				
 			}
 		}
 	}
@@ -118,8 +136,10 @@ std::string Environment::mapToString() {
 		for (int j = 0; j < width; j++) {
 			switch (this->at(i, j)) {
 				case 0:
+					output += 's';
 					break;
 				case 1:
+					output += 't';				
 					break;
 				case 2:
 					output += '#';
@@ -160,14 +180,20 @@ int Environment::at(int x, int y) {
 		return -1;
 }
 
-int Environment::at(VectorPoint &c) {
+int Environment::at(VectorPoint c) {
 	return this->at(c.x, c.y);
 }
 
-std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
+std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
+	std::vector<VectorPoint> result;
 	VectorPoint dir = x - y;
-	
-	
+	for (int i = 0; i < 360; i += 15) {
+		VectorPoint angle = x.calAngle(i, dist);
+		if ((angle.cosin(dir) >= 0.697106781) && (this->at(x + angle) != 2) && ((x + angle).x >= 0) && ((x + angle).y >= 0) && ((x + angle).x <= height) && ((x + angle).y <= width)) {
+			result.push_back(x + angle);
+		}
+	}
+	return result;
 }
 
 
