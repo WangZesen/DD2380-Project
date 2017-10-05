@@ -184,6 +184,57 @@ int Environment::at(VectorPoint c) {
 	return this->at(c.x, c.y);
 }
 
+
+double Environment::calDist(const VectorPoint &c, int index) {
+	switch (obstacles[index].kind) {
+		case 0: {
+			if (c.x < obstacles[index].x - obstacles[index].a / 2) {
+				if (c.y < obstacles[index].y - obstacles[index].b / 2) {
+					return r(s(obstacles[index].x - obstacles[index].a / 2 - c.x) + s(obstacles[index].y - obstacles[index].b / 2 - c.y));
+				} else 
+				if (c.y > obstacles[index].y + obstacles[index].b / 2) {
+					return r(s(obstacles[index].x - obstacles[index].a / 2 - c.x) + s(obstacles[index].y + obstacles[index].b / 2 - c.y));
+				} else {
+					return r(s(obstacles[index].x - obstacles[index].a / 2 - c.x));
+				}
+			} else 
+			if (c.x > obstacles[index].x + obstacles[index].a / 2) {
+				if (c.y < obstacles[index].y - obstacles[index].b / 2) {
+					return r(s(obstacles[index].x + obstacles[index].a / 2 - c.x) + s(obstacles[index].y - obstacles[index].b / 2 - c.y));
+				} else 
+				if (c.y > obstacles[index].y + obstacles[index].b / 2) {
+					return r(s(obstacles[index].x + obstacles[index].a / 2 - c.x) + s(obstacles[index].y + obstacles[index].b / 2 - c.y));
+				} else {
+					return r(s(obstacles[index].x + obstacles[index].a / 2 - c.x));
+				}
+			} else {
+				if (c.y < obstacles[index].y - obstacles[index].b / 2) {
+					return r(s(obstacles[index].y - obstacles[index].b / 2 - c.y));
+				} else 
+				if (c.y > obstacles[index].y + obstacles[index].b / 2) {
+					return r(s(c.y - obstacles[index].y - obstacles[index].b / 2));
+				} else {
+					return 0;
+				}
+			}
+			break;
+		}
+		case 1: {
+			if ((c - VectorPoint(obstacles[index].x, obstacles[index].y)).length() <= obstacles[index].r)
+				return 0;
+			else 
+				return (c - VectorPoint(obstacles[index].x, obstacles[index].y)).length() - obstacles[index].r;
+			break;
+		}
+	}
+}
+
+double Environment::potential(const VectorPoint& c) {
+	for (int i = 0; i < numObstacles; i++) {
+		double distance = calDist(c, i);
+	}
+}
+
 std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
 	std::vector<VectorPoint> result;
 	VectorPoint dir = x - y;

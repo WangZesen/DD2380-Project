@@ -89,12 +89,24 @@ class Environment {
 		// Param dist: propagation distance
 		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
 
+
+		double calDist(const VectorPoint &c, int index);
+		double potential(const VectorPoint& c);
+
 	private:
 		const int width = 500;
 		const int height = 500;
 		const int numObstacles = 5;
 		int Map[500][500];
 		std::vector<Obstacle> obstacles;
+		
+		double s(double x) {
+			return x * x;
+		}
+		
+		double r(double x) {
+			return sqrt(x);
+		}
 
 
 
