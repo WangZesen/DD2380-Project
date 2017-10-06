@@ -31,12 +31,14 @@ class VectorPoint {
 		// Dot product of two vectors
 		double operator*(const VectorPoint &c) const;
 		
+		// Get a unit vecotr
+		VectorPoint operator/(int len) const;
+		
 		// Cosin value of the angle between two vectors
 		double cosin(const VectorPoint &c);
 		
 		// Gives a vector with angle and dist
 		VectorPoint calAngle(double angle, double dist) const;
-		
 };
 
 class Obstacle {
@@ -89,7 +91,7 @@ class Environment {
 		// Param dist: propagation distance
 		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
 
-
+		VectorPoint closestPoint(const VectorPoint &c, int index);
 		double calDist(const VectorPoint &c, int index);
 		double potential(const VectorPoint& c);
 

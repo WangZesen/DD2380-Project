@@ -27,6 +27,10 @@ double VectorPoint::operator*(const VectorPoint &c) const {
 	return (x * c.x + y * c.y);
 }
 
+VectorPoint VectorPoint::operator/(int len) const {
+	return VectorPoint(x / len, y / len);
+}
+
 double VectorPoint::cosin(const VectorPoint &c) {
 	return (VectorPoint(x, y) * c) / this->length() / c.length();
 }
@@ -185,6 +189,50 @@ int Environment::at(VectorPoint c) {
 }
 
 
+VectorPoint Environment::closestPoint(const VectorPoint &c, int index) {
+	switch (obstacles[index].kind) {
+		case 0: {
+			if (c.x < obstacles[index].x - obstacles[index].a / 2) {
+				if (c.y < obstacles[index].y - obstacles[index].b / 2) {
+					return VectorPoint(obstacles[index].x - obstacles[index].a / 2, obstacles[index].y - obstacles[index].b / 2);
+				} else 
+				if (c.y > obstacles[index].y + obstacles[index].b / 2) {
+					return VectorPoint(obstacles[index].x - obstacles[index].a / 2, obstacles[index].y + obstacles[index].b / 2);
+				} else {
+					return VectorPoint(obstacles[index].x - obstacles[index].a / 2, c.y);
+				}
+			} else 
+			if (c.x > obstacles[index].x + obstacles[index].a / 2) {
+				if (c.y < obstacles[index].y - obstacles[index].b / 2) {
+					return VectorPoint(obstacles[index].x + obstacles[index].a / 2, obstacles[index].y - obstacles[index].b / 2);
+				} else 
+				if (c.y > obstacles[index].y + obstacles[index].b / 2) {
+					return VectorPoint(obstacles[index].x + obstacles[index].a / 2, obstacles[index].y - obstacles[index].b / 2);
+				} else {
+					return VectorPoint(obstacles[index].x + obstacles[index].a / 2, c.y);
+				}
+			} else {
+				if (c.y < obstacles[index].y - obstacles[index].b / 2) {
+					return VectorPoint(c.x, obstacles[index].y - obstacles[index].b / 2);
+				} else 
+				if (c.y > obstacles[index].y + obstacles[index].b / 2) {
+					return VectorPoint(c.x, obstacles[index].y + obstacles[index].b / 2);
+				} else {
+					return VectorPoint(0, 0);
+				}
+			}
+			break;
+		}
+		case 1: {
+			if ((c - VectorPoint(obstacles[index].x, obstacles[index].y)).length() <= obstacles[index].r)
+				return VectorPoint(0, 0);
+			else 
+				return VectorPoint(obstacles[index].x, obstacles[index].y);
+			break;
+		}
+	}
+}
+
 double Environment::calDist(const VectorPoint &c, int index) {
 	switch (obstacles[index].kind) {
 		case 0: {
@@ -230,8 +278,12 @@ double Environment::calDist(const VectorPoint &c, int index) {
 }
 
 double Environment::potential(const VectorPoint& c) {
+	double gamma = 2, k = 10, range = 50;
 	for (int i = 0; i < numObstacles; i++) {
 		double distance = calDist(c, i);
+		double p = range / gamma * s(1 / distance - 1 / range);
+		VectorPoint temp = closestPoint(c, i);
+		std::cout << "[Debug] distance = " << distance << ", test distance = " << (temp - c).length() << std::endl;
 	}
 }
 
