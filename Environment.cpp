@@ -27,6 +27,10 @@ double VectorPoint::operator*(const VectorPoint &c) const {
 	return (x * c.x + y * c.y);
 }
 
+VectorPoint VectorPoint::operator*(int scalar) const {
+	return VectorPoint(x * scalar, y * scalar);
+}
+
 VectorPoint VectorPoint::operator/(int len) const {
 	return VectorPoint(x / len, y / len);
 }
@@ -279,12 +283,15 @@ double Environment::calDist(const VectorPoint &c, int index) {
 
 double Environment::potential(const VectorPoint& c) {
 	double gamma = 2, k = 10, range = 50;
+	VectorPoint totalForce(0, 0);
 	for (int i = 0; i < numObstacles; i++) {
 		double distance = calDist(c, i);
 		double p = range / gamma * s(1 / distance - 1 / range);
 		VectorPoint point = closestPoint(c, i);
 		VectorPoint force = c - point;
 		force = force / force.length();
+		force = force * (k / s(distance)) * (1 / distance - 1 / range);
+		totalForce = totalForce + force;
 	}
 	return 0;
 }

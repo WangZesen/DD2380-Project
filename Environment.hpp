@@ -31,6 +31,9 @@ class VectorPoint {
 		// Dot product of two vectors
 		double operator*(const VectorPoint &c) const;
 		
+		// Product of a vector and scalar
+		VectorPoint operator*(int scalar) const;
+		
 		// Get a unit vecotr
 		VectorPoint operator/(int len) const;
 		
