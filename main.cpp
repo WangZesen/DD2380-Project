@@ -1,5 +1,6 @@
 #include "Environment.hpp"
 #include <iostream>
+#include <math.h>
 using namespace std;
 int main() {
 	Environment test;
@@ -13,4 +14,6 @@ int main() {
 	for (int i = 0; i < result.size(); i++) {
 		std::cerr << "[Debug] Point " << i << ": x = " << result[i].x << ", y = " << result[i].y << std::endl;
 	}
+	
+	double t = test.potential(y);
 }

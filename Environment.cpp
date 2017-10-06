@@ -3,7 +3,7 @@
 // VectorPoint
 
 double VectorPoint::length() const {
-	return (x * x + y * y);
+	return sqrt(x * x + y * y);
 }
 
 void VectorPoint::info() {
@@ -282,9 +282,11 @@ double Environment::potential(const VectorPoint& c) {
 	for (int i = 0; i < numObstacles; i++) {
 		double distance = calDist(c, i);
 		double p = range / gamma * s(1 / distance - 1 / range);
-		VectorPoint temp = closestPoint(c, i);
-		std::cout << "[Debug] distance = " << distance << ", test distance = " << (temp - c).length() << std::endl;
+		VectorPoint point = closestPoint(c, i);
+		VectorPoint force = c - point;
+		force = force / force.length();
 	}
+	return 0;
 }
 
 std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
