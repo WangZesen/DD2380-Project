@@ -187,6 +187,11 @@ int Environment::at(VectorPoint c) {
 	return this->at(c.x, c.y);
 }
 
+VectorPoint Environment::startPoint() {
+    return VectorPoint(obstacles[numObstacles].x, obstacles[numObstacles].y);
+}
+
+
 std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
 	std::vector<VectorPoint> result;
 	VectorPoint dir = x - y;

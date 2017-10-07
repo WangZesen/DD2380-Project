@@ -94,6 +94,8 @@ class Environment {
 		// Param x, y: present a vector from y to x
 		// Param dist: propagation distance
 		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
+		
+		VectorPoint startPoint();
 
 	private:
 		const int width = 500;
