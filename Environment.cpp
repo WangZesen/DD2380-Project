@@ -191,7 +191,7 @@ VectorPoint Environment::startPoint() {
     return VectorPoint(obstacles[numObstacles].x, obstacles[numObstacles].y);
 }
 
-VectorPoint Environment::startPoint() {
+VectorPoint Environment::endPoint() {
     return VectorPoint(obstacles[numObstacles + 1].x, obstacles[numObstacles + 1].y);
 }
 
