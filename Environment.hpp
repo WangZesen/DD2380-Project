@@ -20,6 +20,12 @@ class VectorPoint {
 		double length() const;
 		double x, y;
 		void info();
+		
+		VectorPoint() {
+		    x = 0;
+		    y = 0;
+		}
+		
 		VectorPoint(double initX, double initY);
 		
 		// Substraction of two point gives a vector
