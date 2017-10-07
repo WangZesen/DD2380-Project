@@ -191,6 +191,9 @@ VectorPoint Environment::startPoint() {
     return VectorPoint(obstacles[numObstacles].x, obstacles[numObstacles].y);
 }
 
+VectorPoint Environment::startPoint() {
+    return VectorPoint(obstacles[numObstacles + 1].x, obstacles[numObstacles + 1].y);
+}
 
 std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
 	std::vector<VectorPoint> result;

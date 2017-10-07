@@ -96,6 +96,7 @@ class Environment {
 		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
 		
 		VectorPoint startPoint();
+		VectorPoint endPoint();
 
 	private:
 		const int width = 500;
