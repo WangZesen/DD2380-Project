@@ -6,7 +6,7 @@ VectorPoint calAngle(double angle, double dist) {
 }
 
 double VectorPoint::length() const {
-	return (x * x + y * y);
+	return sqrt(x * x + y * y);
 }
 
 void VectorPoint::info() {
@@ -190,8 +190,12 @@ int Environment::at(VectorPoint c) {
 std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
 	std::vector<VectorPoint> result;
 	VectorPoint dir = x - y;
+	
+	//std::cerr << dir.x << " " << dir.y << std::endl;
+	
 	for (int i = 0; i < 360; i += 15) {
 		VectorPoint angle = x.calAngle(i, dist);
+		//std::cerr << angle.x << " " << angle.y << " " << angle.cosin(dir) << std::endl;
 		if ((angle.cosin(dir) >= 0.697106781) && (this->at(x + angle) != 2) && ((x + angle).x >= 0) && ((x + angle).y >= 0) && ((x + angle).x <= height) && ((x + angle).y <= width)) {
 			result.push_back(x + angle);
 		}
