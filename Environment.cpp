@@ -1,6 +1,9 @@
 #include "Environment.hpp"
 
 // VectorPoint
+VectorPoint calAngle(double angle, double dist) {
+    return VectorPoint(dist * sin(angle * PI / 180.0), dist * cos(angle * PI / 180.0));
+}
 
 double VectorPoint::length() const {
 	return (x * x + y * y);
