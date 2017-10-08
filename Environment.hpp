@@ -67,6 +67,7 @@ class Obstacle {
 		void set(int X, int Y, int Kind, int R, int A, int B);
 
 		bool isIn(int testX, int testY);
+		VectorPoint vectorForm();		
 };
 
 class Environment {
@@ -97,6 +98,7 @@ class Environment {
 		VectorPoint closestPoint(const VectorPoint &c, int index);
 		double calDist(const VectorPoint &c, int index);
 		double potential(const VectorPoint& c);
+        bool straightLine(const VectorPoint& x, const VectorPoint& y);
 
 	private:
 		const int width = 500;

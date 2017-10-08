@@ -83,6 +83,10 @@ bool Obstacle::isIn(int testX, int testY) {
 	}
 }
 
+VectorPoint Obstacle::vectorForm() {
+    return VectorPoint(x, y);
+}
+
 // Environment
 
 Environment::Environment() {
@@ -282,18 +286,22 @@ double Environment::calDist(const VectorPoint &c, int index) {
 }
 
 double Environment::potential(const VectorPoint& c) {
-	double gamma = 2, k = 10, range = 50;
+	double gamma = 2, k = 10, range = 5000, sum = 0;
 	VectorPoint totalForce(0, 0);
 	for (int i = 0; i < numObstacles; i++) {
 		double distance = calDist(c, i);
 		double p = range / gamma * s(1 / distance - 1 / range);
-		VectorPoint point = closestPoint(c, i);
-		VectorPoint force = c - point;
-		force = force / force.length();
-		force = force * (k / s(distance)) * (1 / distance - 1 / range);
-		totalForce = totalForce + force;
+        sum += p;
 	}
-	return 0;
+    
+    double ka = 1.0;
+	VectorPoint start = c - obstacles[numObstacles].vectorForm();
+	sum += ka * start.length();
+	
+	//VectorPoint end = c - obstacles[numObstacles + 1].vectorForm();
+	//sum -= ka * end.length();
+	
+	return sum;
 }
 
 std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist) {
@@ -309,6 +317,10 @@ std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, cons
 }
 
 
-
+bool Environment::straightLine(const VectorPoint& x, const VectorPoint& y) {
+    
+    
+    return true;
+}
 
 
