@@ -317,8 +317,21 @@ std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, cons
 }
 
 
-bool Environment::straightLine(const VectorPoint& x, const VectorPoint& y) {
+bool Environment::blocked(const VectorPoint& x, const VectorPoint& y) {
     
+    VectorPoint dir = y - x;
+    VectorPoint start = x;
+    
+    double totalLength = dir.length();
+    dir = dir / dir.length();
+    VectorPoint unit = dir;
+    
+    while (unit.length() < totalLength) {
+        if (this->at(x + dir) == 2) {
+            return false;
+        }
+        dir = dir + unit;
+    }
     
     return true;
 }

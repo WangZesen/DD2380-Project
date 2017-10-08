@@ -98,7 +98,7 @@ class Environment {
 		VectorPoint closestPoint(const VectorPoint &c, int index);
 		double calDist(const VectorPoint &c, int index);
 		double potential(const VectorPoint& c);
-        bool straightLine(const VectorPoint& x, const VectorPoint& y);
+        bool blocked(const VectorPoint& x, const VectorPoint& y);
 
 	private:
 		const int width = 500;
