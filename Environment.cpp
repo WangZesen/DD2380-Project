@@ -87,22 +87,30 @@ VectorPoint Obstacle::vectorForm() {
     return VectorPoint(x, y);
 }
 
+void Obstacle::drawObstacle(Mat &image) {
+    if (kind == 1) {
+        circle(image, Point(x, y), int(r), Scalar(255, 0, 0));
+    } else 
+    if (kind == 0) {
+        rectangle(image, Point(x - a / 2, y - b / 2), Point(x + a / 2, y + b / 2), Scalar(255, 0, 0));
+    }
+}
+
+
 // Environment
 
 Environment::Environment() {
-	//VectorPoint x(1, 2);
-	//x.calAngle(150, 2).info();
 
 	srand((unsigned int) time(NULL));
 	for (int i = 0; i < numObstacles; i++) {
 		switch (rand() % 2) {
 			case 0: {
-				Obstacle temp(rand() % height, rand() % width, 0, 0, rand() % (height / 10) + 10, rand() % (height / 10) + 10);
+				Obstacle temp(rand() % height, rand() % width, 0, 0, rand() % (height / 5) + 10, rand() % (height / 5) + 10);
 				obstacles.push_back(temp);
 				break;
 			}
 			case 1: {
-				Obstacle temp(rand() % height, rand() % width, 1, rand() % (height / 10) + 10, 0, 0);
+				Obstacle temp(rand() % height, rand() % width, 1, rand() % (height / 5) + 10, 0, 0);
 				obstacles.push_back(temp);
 				break;
 			}
@@ -326,7 +334,7 @@ bool Environment::blocked(const VectorPoint& x, const VectorPoint& y) {
     dir = dir / dir.length();
     VectorPoint unit = dir;
     
-    while (unit.length() < totalLength) {
+    while (dir.length() < totalLength) {
         if (this->at(x + dir) == 2) {
             return false;
         }
@@ -334,6 +342,14 @@ bool Environment::blocked(const VectorPoint& x, const VectorPoint& y) {
     }
     
     return true;
+}
+
+VectorPoint Environment::startPoint() {
+    return VectorPoint(obstacles[numObstacles].x, obstacles[numObstacles].y);
+}
+
+VectorPoint Environment::endPoint() {
+    return VectorPoint(obstacles[numObstacles + 1].x, obstacles[numObstacles + 1].y);
 }
 
 

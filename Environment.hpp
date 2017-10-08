@@ -1,3 +1,6 @@
+#ifndef __ENVIRONMENT_HPP__
+#define __ENVIRONMENT_HPP__
+
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -5,7 +8,12 @@
 #include <time.h>
 #include <string>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #define PI 3.14159265359
+
+using namespace cv;
 
 class VectorPoint {
 		
@@ -67,7 +75,9 @@ class Obstacle {
 		void set(int X, int Y, int Kind, int R, int A, int B);
 
 		bool isIn(int testX, int testY);
-		VectorPoint vectorForm();		
+		VectorPoint vectorForm();
+		
+		void drawObstacle(Mat &image);
 };
 
 class Environment {
@@ -100,12 +110,16 @@ class Environment {
 		double potential(const VectorPoint& c);
         bool blocked(const VectorPoint& x, const VectorPoint& y);
 
+		const int numObstacles = 5;
+		std::vector<Obstacle> obstacles;
+		
+        VectorPoint startPoint();
+		VectorPoint endPoint();
 	private:
 		const int width = 500;
 		const int height = 500;
-		const int numObstacles = 5;
-		int Map[500][500];
-		std::vector<Obstacle> obstacles;
+
+		int Map[500][500];		
 		
 		double s(double x) {
 			return x * x;
@@ -118,3 +132,6 @@ class Environment {
 
 
 };
+
+
+#endif
