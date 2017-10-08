@@ -5,6 +5,5 @@ DD2380 Artificial Intelligence Project
 
 2017.10.04 16:08 Update: Finish Environment
 
-How to use?
+2017.10.08 19:50 Start implementing Genetic Algorithm
 
-Include Environment.hpp in programs. See comments to know the usage of each class and function.
