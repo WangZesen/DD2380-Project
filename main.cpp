@@ -5,8 +5,47 @@
 #include <iostream>
 #include <math.h>
 #include <string>
+#include <ctime>
+#include <random>
+
 using namespace cv;
 using namespace std;
+void filter(vector<Route> &survivals, Environment &env, int survivalNum) {
+    double sum = 0;
+    int num = survivals.size();
+    
+    if (num <= survivalNum)
+        return;
+    
+    VectorPoint endPoint = env.endPoint();
+    
+
+    vector<double> accAdapt;
+    for (vector<Route>::iterator iter = survivals.begin(); iter != survivals.end(); iter++) {
+        sum = sum + (*iter).adaptability(endPoint);
+        accAdapt.push_back(sum);
+    }
+    
+    uniform_real_distribution<double> dist(0.0, 1.0);
+    mt19937 seed;
+    seed.seed(random_device{}());
+    
+    vector<Route> newRouteList;    
+            
+    for (int i = 0; i < survivalNum; i++) {
+        double randomNumber = dist(seed);
+        int j;
+        for (j = 0; j < num; j++) {
+            if (randomNumber < accAdapt[j] / sum) 
+                break;
+        }
+        newRouteList.push_back(survivals[j]);
+    }
+    
+    survivals = newRouteList;
+    
+}
+
 int main() {
 	/*Environment test;
 	//cout << test.at(10, 10);
@@ -46,7 +85,7 @@ int main() {
     
 	// Algorithm starts here
 
-    // Initial start 
+    // Initial start routes
 
     Environment env;
     vector<Route> survivals;
@@ -54,10 +93,26 @@ int main() {
     Mat image(500, 500, 6);
 
     VectorPoint startPoint = env.startPoint();	
-	for (int i = 0; i < 360; i++) {
-	   survivals.push_back(Route(startPoint, startPoint + startPoint.calAngle(i, 10)));
-	   survivals[i].drawRoute(image);
+    
+    const int gap = 3;
+    const int survivalNum = 50;
+    
+	for (int i = 0; i < 360; i += gap) {
+        survivals.push_back(Route(startPoint, startPoint + startPoint.calAngle(i, 10)));
+        //survivals[i / gap].drawRoute(image);
 	}
+	
+	filter(survivals, env, survivalNum);
+	
+	/*for (int i = 0; i < survivals.size(); i++) {
+        survivals[i].drawRoute(image);
+        //survivals[i / gap].drawRoute(image);
+	}*/
+	
+	for (int t = 0; t < 100; t++) {
+	    
+	}
+	
 	
 	imshow("map", image);
 	waitKey(0);
