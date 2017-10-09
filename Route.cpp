@@ -7,6 +7,9 @@ Route::Route(std::vector<VectorPoint> &set1, std::vector<VectorPoint> &set2, int
     for (int i = index2; i < set2.size(); i++) {
         set.push_back(set2[i]);
     }
+    lengthSum = 0.0;
+    indexSum = 0;
+    srand((unsigned int)time(NULL));
 }
 
 Route::Route(std::vector<VectorPoint> &set1, VectorPoint &newPoint) {
@@ -18,20 +21,60 @@ Route::Route(std::vector<VectorPoint> &set1, VectorPoint &newPoint) {
 Route::Route(VectorPoint x, VectorPoint y) {
     set.push_back(x);
     set.push_back(y);
+    
+    lengthSum = (x - y).length();
+    indexSum = 1;
+}
+
+Route::Route(Route *r, VectorPoint &x) {
+    if (r->indexSum < r->set.size() - 1) {
+        for (int i = indexSum; i < r->set.size() - 1; i++) {
+            r->lengthSum += (r->set[i] - r->set[i + 1]).length();
+            r->indexSum++;
+        }
+    }
+    lengthSum = r->lengthSum + (r->set[r->set.size() - 1] - x).length();
+    indexSum = r->indexSum + 1;
+    set = r->set;
+    set.push_back(x);
 }
 
 double Route::adaptability(VectorPoint &endPoint) {
     int len = set.size();
-    double sum = 0;
-    for (int i = 0; i < len - 1; i++) {
-        sum += (set[i + 1] - set[i]).length();
+    for (int i = indexSum; i < len - 1; i++) {
+        lengthSum += (set[i + 1] - set[i]).length();
+        indexSum += 1;
     }
     //sum *= 2;
+    double sum = lengthSum;
     sum += (set[len - 1] - endPoint).length() * 2;
     return sum;
 }
 
-std::vector<Route> Route::mutation(Environment& env, double dist) {
+std::vector<Route> Route::shortMutation(Environment& env, double dist) {
+    
+    int len = set.size();
+    
+    if (len < 50)
+        return std::vector<Route>(); 
+    
+    std::vector<Route> mutatedRoutes;
+    
+    for (int i = 0; i < 5; i++) {
+        int index = rand() % (len - 20) + 1;
+        int nextIndex = index + rand() % 15 + 2;
+        if (nextIndex >= len - 2)
+            nextIndex = len - 2;
+            
+        if ( ( (set[index] - set[index - 1]).cosin(set[nextIndex] - set[index]) >= 0.697106781) && ((set[nextIndex + 1] - set[nextIndex]).cosin(set[nextIndex] - set[index]) >= 0.697106781) && (env.blocked(set[index], set[nextIndex]))) {
+            mutatedRoutes.push_back(Route(set, set, index, nextIndex));
+        }
+    }
+    
+    return mutatedRoutes;
+}
+
+std::vector<Route> Route::extendMutation(Environment& env, double dist) {
     
     int len = set.size();
     std::vector<VectorPoint> result = env.nextPropagation(set[len - 1], set[len - 2], dist);
@@ -40,7 +83,7 @@ std::vector<Route> Route::mutation(Environment& env, double dist) {
     std::vector<Route> mutatedRoutes;
     
     for (int i = 0; i < stateNum; i++) {
-        mutatedRoutes.push_back(Route(set, result[i]));
+        mutatedRoutes.push_back(Route(this, result[i]));
     }
     
     return mutatedRoutes;

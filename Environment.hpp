@@ -84,6 +84,8 @@ class Environment {
 	public:
 		// initial a map
 		Environment();
+		
+		Environment(int mapset);
 
 		// Return map in string
 		std::string mapToString();

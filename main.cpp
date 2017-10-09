@@ -1,10 +1,6 @@
 #include "Environment.hpp"
 #include "Route.hpp"
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <iostream>
-#include <math.h>
-#include <string>
+
 #include <ctime>
 #include <random>
 
@@ -38,10 +34,8 @@ void filter(vector<Route> &survivals, Environment &env, int survivalNum, Random 
         accAdapt.push_back(sum);
     }
     
-
-    
     vector<Route> newRouteList;    
-            
+    
     for (int i = 0; i < survivalNum; i++) {
         double randomNumber = generator.dist(generator.seed);
         int j;
@@ -53,7 +47,6 @@ void filter(vector<Route> &survivals, Environment &env, int survivalNum, Random 
     }
     
     survivals = newRouteList;
-    
 }
 
 int main() {
@@ -99,7 +92,7 @@ int main() {
 
     // Initial start routes
 
-    Environment env;
+    Environment env(1);
     vector<Route> survivals;
 
     //Mat image(500, 500, 6);
@@ -108,7 +101,7 @@ int main() {
     
     const int gap = 3;
     const int survivalNum = 200;
-    const int extendDist = 1;
+    const int extendDist = 5;
     const double hybridPro = 0.5;
     
     
@@ -125,12 +118,20 @@ int main() {
 	for (int t = 0; t < 10000; t++) {
 	    int size = survivals.size();
 	    
+	    //cerr << "[Debug] Before Mutation, Size = " << size << "\n";
+	    
 	    // Mutation
 	    
 	    for (int i = 0; i < size; i++) {
-            vector<Route> mutations = survivals[i].mutation(env, extendDist);
+	        //cerr << "[Debug] Before Calculating Mutations\n";
+            vector<Route> mutations = survivals[i].extendMutation(env, extendDist);
+            //cerr << "[Debug] Mutations Size = " << mutations.size() << endl;
+            survivals.insert(survivals.end(), mutations.begin(), mutations.end());
+            mutations = survivals[i].shortMutation(env, extendDist);
             survivals.insert(survivals.end(), mutations.begin(), mutations.end());
 	    }
+	    
+	    //cerr << "[Debug] Before Hybrid\n";	    
 	    
 	    // Hybrid
 	    
@@ -142,6 +143,8 @@ int main() {
 	        }
 	    }*/
 	    
+	    //cerr << "[Debug] Before Filter\n";	    
+	    
 	    // Filter
 	    
 	    filter(survivals, env, survivalNum, generator);
@@ -149,6 +152,8 @@ int main() {
 	    // Show
 	    
 	    if (t % 100 == 0) {
+	    
+	        //cerr << "[Debug] Before Show\n";	        
 	        
 	        Mat image(500, 500, 6);
 	        

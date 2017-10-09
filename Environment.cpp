@@ -148,6 +148,44 @@ Environment::Environment() {
 	}
 }
 
+Environment::Environment(int mapset) {
+
+	obstacles.push_back(Obstacle(100, 100, 0, 0, 200, 50));
+	obstacles.push_back(Obstacle(350, 200, 0, 0, 300, 50));
+	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
+	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));	
+	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));	
+	
+	Obstacle temp(20, 20, 0, 0, 20, 20);
+	obstacles.push_back(temp);
+	temp.set(height - 20, width - 20, 0, 0, 20, 20);
+	obstacles.push_back(temp);
+	
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			bool within = false;
+			for (int k = 0; k < numObstacles; k++) {
+				if (obstacles[k].isIn(i, j)) {
+					within = true;
+				}
+			}
+			
+            if (within) {
+                Map[i][j] = 2;
+            } else {
+                Map[i][j] = 3;
+            }
+            
+            if (obstacles[numObstacles].isIn(i, j)) {
+                Map[i][j] = 0;
+            }
+            
+            if (obstacles[numObstacles + 1].isIn(i, j)) {
+                Map[i][j] = 1;
+            }            
+		}
+	}
+}
 
 std::string Environment::mapToString() {
 	std::string output;
