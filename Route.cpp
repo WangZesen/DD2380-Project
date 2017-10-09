@@ -26,15 +26,15 @@ double Route::adaptability(VectorPoint &endPoint) {
     for (int i = 0; i < len - 1; i++) {
         sum += (set[i + 1] - set[i]).length();
     }
-    sum *= 2;
-    sum += (set[len - 1] - endPoint).length();
+    //sum *= 2;
+    sum += (set[len - 1] - endPoint).length() * 2;
     return sum;
 }
 
-std::vector<Route> Route::mutation(Environment& env) {
+std::vector<Route> Route::mutation(Environment& env, double dist) {
     
     int len = set.size();
-    std::vector<VectorPoint> result = env.nextPropagation(set[len - 1], set[len - 2], 1);
+    std::vector<VectorPoint> result = env.nextPropagation(set[len - 1], set[len - 2], dist);
     int stateNum = result.size();
     
     std::vector<Route> mutatedRoutes;
@@ -42,6 +42,7 @@ std::vector<Route> Route::mutation(Environment& env) {
     for (int i = 0; i < stateNum; i++) {
         mutatedRoutes.push_back(Route(set, result[i]));
     }
+    
     return mutatedRoutes;
 }
 

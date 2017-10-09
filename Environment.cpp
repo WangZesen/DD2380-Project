@@ -124,27 +124,26 @@ Environment::Environment() {
 	
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			int within = 4;
-			for (int k = 0; k < numObstacles + 2; k++) {
-				if ((obstacles[k].isIn(i, j)) && (within > obstacles[k].kind)) {
-					within = obstacles[k].kind;
+			bool within = false;
+			for (int k = 0; k < numObstacles; k++) {
+				if (obstacles[k].isIn(i, j)) {
+					within = true;
 				}
 			}
 			
-			switch (within) {
-				case 0: 
-					Map[i][j] = 0;
-					break;
-				case 1:
-					Map[i][j] = 1;
-					break;
-				case 2:
-					Map[i][j] = 2;
-					break;				
-				case 3:
-					Map[i][j] = 3;
-					break;				
-			}
+            if (within) {
+                Map[i][j] = 2;
+            } else {
+                Map[i][j] = 3;
+            }
+            
+            if (obstacles[numObstacles].isIn(i, j)) {
+                Map[i][j] = 0;
+            }
+            
+            if (obstacles[numObstacles + 1].isIn(i, j)) {
+                Map[i][j] = 1;
+            }            
 		}
 	}
 }

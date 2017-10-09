@@ -17,7 +17,7 @@ class Route {
         Route(std::vector<VectorPoint> &set1, std::vector<VectorPoint> &set2, int index1, int index2);
         
         double adaptability(VectorPoint &endPoint);
-        std::vector<Route> mutation(Environment& env);
+        std::vector<Route> mutation(Environment& env, double dist);
         Route hybrid(Route &route, Environment& env);
         
         // Visualization

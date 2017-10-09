@@ -10,30 +10,40 @@
 
 using namespace cv;
 using namespace std;
-void filter(vector<Route> &survivals, Environment &env, int survivalNum) {
-    double sum = 0;
+
+struct Random {
+    uniform_real_distribution<double> dist;
+    mt19937 seed;
+};
+
+void filter(vector<Route> &survivals, Environment &env, int survivalNum, Random &generator) {
+    double sum = 0, min = 0x7fffffff, max = -0x7fffffff;
     int num = survivals.size();
     
     if (num <= survivalNum)
         return;
     
     VectorPoint endPoint = env.endPoint();
-    
+
+    for (vector<Route>::iterator iter = survivals.begin(); iter != survivals.end(); iter++) {
+        if ((*iter).adaptability(endPoint) > max)
+            max = (*iter).adaptability(endPoint);
+        if ((*iter).adaptability(endPoint) < min)
+            min = (*iter).adaptability(endPoint);
+    }
 
     vector<double> accAdapt;
     for (vector<Route>::iterator iter = survivals.begin(); iter != survivals.end(); iter++) {
-        sum = sum + (*iter).adaptability(endPoint);
+        sum = sum + (max + min - (*iter).adaptability(endPoint));
         accAdapt.push_back(sum);
     }
     
-    uniform_real_distribution<double> dist(0.0, 1.0);
-    mt19937 seed;
-    seed.seed(random_device{}());
+
     
     vector<Route> newRouteList;    
             
     for (int i = 0; i < survivalNum; i++) {
-        double randomNumber = dist(seed);
+        double randomNumber = generator.dist(generator.seed);
         int j;
         for (j = 0; j < num; j++) {
             if (randomNumber < accAdapt[j] / sum) 
@@ -81,7 +91,9 @@ int main() {
 	imshow("image", image1);
 	waitKey(0);	*/
 	
-    
+	Random generator;
+	generator.dist = uniform_real_distribution<double>(0.0, 1.0);
+    generator.seed.seed(random_device{}());    
     
 	// Algorithm starts here
 
@@ -90,32 +102,79 @@ int main() {
     Environment env;
     vector<Route> survivals;
 
-    Mat image(500, 500, 6);
+    //Mat image(500, 500, 6);
 
     VectorPoint startPoint = env.startPoint();	
     
     const int gap = 3;
-    const int survivalNum = 50;
+    const int survivalNum = 200;
+    const int extendDist = 1;
+    const double hybridPro = 0.5;
+    
     
 	for (int i = 0; i < 360; i += gap) {
-        survivals.push_back(Route(startPoint, startPoint + startPoint.calAngle(i, 10)));
-        //survivals[i / gap].drawRoute(image);
+        survivals.push_back(Route(startPoint, startPoint + startPoint.calAngle(i, extendDist)));
 	}
 	
-	filter(survivals, env, survivalNum);
-	
-	/*for (int i = 0; i < survivals.size(); i++) {
-        survivals[i].drawRoute(image);
-        //survivals[i / gap].drawRoute(image);
-	}*/
-	
-	for (int t = 0; t < 100; t++) {
+	filter(survivals, env, survivalNum, generator);
+
+    //for (int i = 0; i < survivalNum; i++) {
+    //    survivals[i].drawRoute(image);
+	//}
+    // Start of Genetic Algorithm	
+	for (int t = 0; t < 10000; t++) {
+	    int size = survivals.size();
 	    
+	    // Mutation
+	    
+	    for (int i = 0; i < size; i++) {
+            vector<Route> mutations = survivals[i].mutation(env, extendDist);
+            survivals.insert(survivals.end(), mutations.begin(), mutations.end());
+	    }
+	    
+	    // Hybrid
+	    
+	    /*for (int i = 0; i < size; i++) {
+	        for (int j = i + 1; j < size; j++) {
+	            if (generator.dist(generator.seed) < hybridPro) {
+	                survivals.push_back(survivals[i].hybrid(survivals[j], env));
+	            }
+	        }
+	    }*/
+	    
+	    // Filter
+	    
+	    filter(survivals, env, survivalNum, generator);
+	    
+	    // Show
+	    
+	    if (t % 100 == 0) {
+	        
+	        Mat image(500, 500, 6);
+	        
+	        for (int i = 0; i < 500; i++) {
+	            for (int j = 0; j < 500; j++) {
+	                image.at<double>(i, j) = 0;
+	            }
+	        }
+	        
+	        for (int i = 0; i < env.numObstacles + 2; i++) {
+	            env.obstacles[i].drawObstacle(image);
+	        }
+	    
+    	    
+	    
+    	    for (int i = 0; i < survivalNum; i++) {
+    	        survivals[i].drawRoute(image);
+    	    }
+	    
+       	   	imshow("map", image);
+        	waitKey(0);
+        }
 	}
 	
 	
-	imshow("map", image);
-	waitKey(0);
+
 	
 
 }
