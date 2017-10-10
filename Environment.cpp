@@ -87,16 +87,6 @@ VectorPoint Obstacle::vectorForm() {
     return VectorPoint(x, y);
 }
 
-void Obstacle::drawObstacle(Mat &image) {
-    if (kind == 1) {
-        circle(image, Point(x, y), int(r), Scalar(255, 0, 0));
-    } else 
-    if (kind == 0) {
-        rectangle(image, Point(x - a / 2, y - b / 2), Point(x + a / 2, y + b / 2), Scalar(255, 0, 0));
-    }
-}
-
-
 // Environment
 
 Environment::Environment() {

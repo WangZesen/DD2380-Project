@@ -8,12 +8,7 @@
 #include <time.h>
 #include <string>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
 #define PI 3.14159265359
-
-using namespace cv;
 
 class VectorPoint {
 		
@@ -76,8 +71,6 @@ class Obstacle {
 
 		bool isIn(int testX, int testY);
 		VectorPoint vectorForm();
-		
-		void drawObstacle(Mat &image);
 };
 
 class Environment {
