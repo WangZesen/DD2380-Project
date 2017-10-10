@@ -10,6 +10,11 @@ void VectorPoint::info() {
 	std::cerr << "[Debug] x = " << x << ", y = " << y << std::endl;
 }
 
+VectorPoint::VectorPoint() {
+    x = 0;
+    y = 0;
+}
+
 VectorPoint::VectorPoint(double initX, double initY) {
 	x = initX;
 	y = initY;
@@ -149,12 +154,22 @@ Environment::Environment() {
 }
 
 Environment::Environment(int mapset) {
-
-	obstacles.push_back(Obstacle(100, 100, 0, 0, 200, 50));
-	obstacles.push_back(Obstacle(350, 200, 0, 0, 300, 50));
-	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
-	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));	
-	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));	
+    switch(mapset) {
+        case 1:
+        	obstacles.push_back(Obstacle(100, 100, 0, 0, 200, 50));
+        	obstacles.push_back(Obstacle(350, 200, 0, 0, 300, 50));
+        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
+        	break;
+        case 2:
+        	obstacles.push_back(Obstacle(100, 100, 0, 0, 200, 50));
+        	obstacles.push_back(Obstacle(350, 200, 0, 0, 300, 50));
+        	obstacles.push_back(Obstacle(100, 300, 0, 0, 200, 50));
+        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
+        	break;            
+    }
 	
 	Obstacle temp(20, 20, 0, 0, 20, 20);
 	obstacles.push_back(temp);

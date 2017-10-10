@@ -48,21 +48,21 @@ double Route::adaptability(VectorPoint &endPoint) {
     //sum *= 2;
     double sum = lengthSum;
     sum += (set[len - 1] - endPoint).length() * 2;
-    return sum;
+    return sum / len;
 }
 
 std::vector<Route> Route::shortMutation(Environment& env, double dist) {
     
     int len = set.size();
     
-    if (len < 50)
+    if (len < 80)
         return std::vector<Route>(); 
     
     std::vector<Route> mutatedRoutes;
     
     for (int i = 0; i < 5; i++) {
-        int index = rand() % (len - 20) + 1;
-        int nextIndex = index + rand() % 15 + 2;
+        int index = rand() % (len - 50) + 1;
+        int nextIndex = index + rand() % 45 + 2;
         if (nextIndex >= len - 2)
             nextIndex = len - 2;
             
@@ -89,27 +89,27 @@ std::vector<Route> Route::extendMutation(Environment& env, double dist) {
     return mutatedRoutes;
 }
 
-Route Route::hybrid(Route &route, Environment& env) {
+std::vector<Route> Route::hybrid(Route &route, Environment& env) {
+
+
     int len1 = set.size();
     int len2 = route.set.size();
     
-    double min = 0x7fffffff;
-    int index1, index2;
+
     
-    for (int i = 1; i < len1; i++) {
-        for (int j = 1; j < len2; j++) {
-            if (env.blocked(set[i], route.set[j])) {
-                double temp = partialAdaptability(set, route.set, i, j);
-                if (temp < min) {
-                    min = temp;
-                    index1 = i;
-                    index2 = j;
-                }
-            }
-        }
+    if ((len1 < 50) || (len2 < 50))
+        return std::vector<Route>();
+
+    std::vector<Route> hybrids;
+    int index1, index2;    
+    
+    index1 = rand() % (len1 - 2) + 1;
+    index2 = rand() % (len2 - 2) + 1;
+    if ( ((set[index1] - set[index1 - 1]).cosin(route.set[index2] - set[index1]) >= 0.697106781) && ((route.set[index2 + 1] - route.set[index2]).cosin(route.set[index2] - set[index1]) >= 0.697106781) && (env.blocked(set[index1], route.set[index2]))) {
+        hybrids.push_back(Route(set, route.set, index1, index2));
     }
-    
-    return Route(set, route.set, index1, index2);
+        
+    return hybrids;
 }
 
 void Route::drawRoute(Mat &image) {

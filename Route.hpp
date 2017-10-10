@@ -17,7 +17,7 @@ class Route {
         double adaptability(VectorPoint &endPoint);
         std::vector<Route> extendMutation(Environment& env, double dist);
         std::vector<Route> shortMutation(Environment& env, double dist);        
-        Route hybrid(Route &route, Environment& env);
+        std::vector<Route> hybrid(Route &route, Environment& env);
         
         // Visualization
         void drawRoute(Mat &image);

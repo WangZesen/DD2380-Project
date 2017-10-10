@@ -92,7 +92,7 @@ int main() {
 
     // Initial start routes
 
-    Environment env(1);
+    Environment env(2);
     vector<Route> survivals;
 
     //Mat image(500, 500, 6);
@@ -102,7 +102,7 @@ int main() {
     const int gap = 3;
     const int survivalNum = 200;
     const int extendDist = 5;
-    const double hybridPro = 0.5;
+    const double hybridPro = 0.2;
     
     
 	for (int i = 0; i < 360; i += gap) {
@@ -123,9 +123,7 @@ int main() {
 	    // Mutation
 	    
 	    for (int i = 0; i < size; i++) {
-	        //cerr << "[Debug] Before Calculating Mutations\n";
             vector<Route> mutations = survivals[i].extendMutation(env, extendDist);
-            //cerr << "[Debug] Mutations Size = " << mutations.size() << endl;
             survivals.insert(survivals.end(), mutations.begin(), mutations.end());
             mutations = survivals[i].shortMutation(env, extendDist);
             survivals.insert(survivals.end(), mutations.begin(), mutations.end());
@@ -134,15 +132,16 @@ int main() {
 	    //cerr << "[Debug] Before Hybrid\n";	    
 	    
 	    // Hybrid
-	    
-	    /*for (int i = 0; i < size; i++) {
+	    /*
+	    for (int i = 0; i < size; i++) {
 	        for (int j = i + 1; j < size; j++) {
 	            if (generator.dist(generator.seed) < hybridPro) {
-	                survivals.push_back(survivals[i].hybrid(survivals[j], env));
-	            }
+	                vector<Route> hybrids = survivals[i].hybrid(survivals[j], env);
+                    survivals.insert(survivals.end(), hybrids.begin(), hybrids.end());
+                }
 	        }
-	    }*/
-	    
+	    }
+	    */
 	    //cerr << "[Debug] Before Filter\n";	    
 	    
 	    // Filter
