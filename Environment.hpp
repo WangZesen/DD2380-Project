@@ -1,3 +1,6 @@
+#ifndef __ENVIRONMENT_HPP__
+#define __ENVIRONMENT_HPP__
+
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -5,7 +8,12 @@
 #include <time.h>
 #include <string>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #define PI 3.14159265359
+
+using namespace cv;
 
 class VectorPoint {
 		
@@ -20,12 +28,6 @@ class VectorPoint {
 		double length() const;
 		double x, y;
 		void info();
-		
-		VectorPoint() {
-		    x = 0;
-		    y = 0;
-		}
-		
 		VectorPoint(double initX, double initY);
 		
 		// Substraction of two point gives a vector
@@ -37,12 +39,17 @@ class VectorPoint {
 		// Dot product of two vectors
 		double operator*(const VectorPoint &c) const;
 		
+		// Product of a vector and scalar
+		VectorPoint operator*(int scalar) const;
+		
+		// Get a unit vecotr
+		VectorPoint operator/(int len) const;
+		
 		// Cosin value of the angle between two vectors
 		double cosin(const VectorPoint &c);
 		
 		// Gives a vector with angle and dist
 		VectorPoint calAngle(double angle, double dist) const;
-		
 };
 
 class Obstacle {
@@ -68,12 +75,17 @@ class Obstacle {
 		void set(int X, int Y, int Kind, int R, int A, int B);
 
 		bool isIn(int testX, int testY);
+		VectorPoint vectorForm();
+		
+		void drawObstacle(Mat &image);
 };
 
 class Environment {
 	public:
 		// initial a map
 		Environment();
+		
+		Environment(int mapset);
 
 		// Return map in string
 		std::string mapToString();
@@ -94,17 +106,34 @@ class Environment {
 		// Param x, y: present a vector from y to x
 		// Param dist: propagation distance
 		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
-		
-		VectorPoint startPoint();
-		VectorPoint endPoint();
 
+		VectorPoint closestPoint(const VectorPoint &c, int index);
+		double calDist(const VectorPoint &c, int index);
+		double potential(const VectorPoint& c);
+        bool blocked(const VectorPoint& x, const VectorPoint& y);
+
+		const int numObstacles = 5;
+		std::vector<Obstacle> obstacles;
+		
+        VectorPoint startPoint();
+		VectorPoint endPoint();
 	private:
 		const int width = 500;
 		const int height = 500;
-		const int numObstacles = 5;
-		int Map[500][500];
-		std::vector<Obstacle> obstacles;
+
+		int Map[500][500];		
+		
+		double s(double x) {
+			return x * x;
+		}
+		
+		double r(double x) {
+			return sqrt(x);
+		}
 
 
 
 };
+
+
+#endif
