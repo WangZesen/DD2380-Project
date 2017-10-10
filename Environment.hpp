@@ -24,6 +24,7 @@ class VectorPoint {
 		double x, y;
 		void info();
 		VectorPoint(double initX, double initY);
+		VectorPoint();
 		
 		// Substraction of two point gives a vector
 		VectorPoint operator-(const VectorPoint &c) const;

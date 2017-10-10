@@ -10,6 +10,11 @@ void VectorPoint::info() {
 	std::cerr << "[Debug] x = " << x << ", y = " << y << std::endl;
 }
 
+VectorPoint::VectorPoint() {
+    x = 0;
+    y = 0;
+}
+
 VectorPoint::VectorPoint(double initX, double initY) {
 	x = initX;
 	y = initY;
