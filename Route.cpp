@@ -48,6 +48,7 @@ double Route::adaptability(VectorPoint &endPoint) {
     //sum *= 2;
     double sum = lengthSum;
     sum += (set[len - 1] - endPoint).length() * 2;
+    if (len > 100) len = 100;
     return sum / len;
 }
 

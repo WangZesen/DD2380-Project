@@ -12,6 +12,33 @@ struct Random {
     mt19937 seed;
 };
 
+void output(vector<Route> &survivals, Environment &env) {
+
+    cout << "clear\n";
+
+    double sum = 0, min = 0x7fffffff, max = -0x7fffffff;
+    int num = survivals.size();
+    
+    VectorPoint endPoint = env.endPoint();
+
+    for (vector<Route>::iterator iter = survivals.begin(); iter != survivals.end(); iter++) {
+        if ((*iter).adaptability(endPoint) > max)
+            max = (*iter).adaptability(endPoint);
+        if ((*iter).adaptability(endPoint) < min)
+            min = (*iter).adaptability(endPoint);
+    }
+
+    vector<double> adapt;
+    for (vector<Route>::iterator iter = survivals.begin(); iter != survivals.end(); iter++) {
+        cout << "line\n";
+        cout << int(((*iter).adaptability(endPoint) - min) * 255 / (max - min)) << endl;
+        for (int i = 0; i < (*iter).set.size(); i++) {
+            cout << int((*iter).set[i].x) << " " << int((*iter).set[i].y) << endl; 
+        }
+        cout << "endline\n";
+    }
+}
+
 void filter(vector<Route> &survivals, Environment &env, int survivalNum, Random &generator) {
     double sum = 0, min = 0x7fffffff, max = -0x7fffffff;
     int num = survivals.size();
@@ -50,40 +77,7 @@ void filter(vector<Route> &survivals, Environment &env, int survivalNum, Random 
 }
 
 int main() {
-	/*Environment test;
-	//cout << test.at(10, 10);
-	test.mapInfo();
-	
-	VectorPoint x(357, 70);
-	VectorPoint y(100, 234);
-	
-	vector<VectorPoint> result = test.nextPropagation(y, x, 1);
-	for (int i = 0; i < result.size(); i++) {
-		std::cerr << "[Debug] Point " << i << ": x = " << result[i].x << ", y = " << result[i].y << std::endl;
-	}
-	
-	double t = test.potential(y);
-	std::cerr << "[Debug] Potential " << t << std::endl;
-	
-	//string a = "123";
-	//Mat image = imread(a.c_str(), CV_LOAD_IMAGE_COLOR);
-	Mat image1(500, 500, 6);
-	
-	//cout << image1.at<double>(0,0) << endl;
-	
-	//line(image1, Point(10, 100), Point(50, 200), Scalar(255, 0, 0));
-	
-	
-	vector<Route> routeList;
-	
-    //routeList[0].drawRoute(image1);
-	
-	for (int i = 0; i < test.numObstacles + 2; i++)
-    	test.obstacles[i].drawObstacle(image1);
-	
-	imshow("image", image1);
-	waitKey(0);	*/
-	
+
 	Random generator;
 	generator.dist = uniform_real_distribution<double>(0.0, 1.0);
     generator.seed.seed(random_device{}());    
@@ -92,16 +86,26 @@ int main() {
 
     // Initial start routes
 
-    Environment env(2);
+    Environment env(1);
     vector<Route> survivals;
+
+
+    // Output Obstacles' information (for visualization)
+    
+    for (int i = 0; i < env.numObstacles + 2; i++) {
+        cout << "obstacle\n";
+        cout << env.obstacles[i].x << " " << env.obstacles[i].y << " ";
+        cout << env.obstacles[i].kind << " " << env.obstacles[i].r << " ";
+        cout << env.obstacles[i].a << " " << env.obstacles[i].b << "\n";        
+    }
 
     //Mat image(500, 500, 6);
 
     VectorPoint startPoint = env.startPoint();	
     
     const int gap = 3;
-    const int survivalNum = 200;
-    const int extendDist = 5;
+    const int survivalNum = 100;
+    const int extendDist = 6;
     const double hybridPro = 0.2;
     
     
@@ -132,7 +136,7 @@ int main() {
 	    //cerr << "[Debug] Before Hybrid\n";	    
 	    
 	    // Hybrid
-	    /*
+	    
 	    for (int i = 0; i < size; i++) {
 	        for (int j = i + 1; j < size; j++) {
 	            if (generator.dist(generator.seed) < hybridPro) {
@@ -141,16 +145,26 @@ int main() {
                 }
 	        }
 	    }
-	    */
+	    
 	    //cerr << "[Debug] Before Filter\n";	    
 	    
 	    // Filter
 	    
 	    filter(survivals, env, survivalNum, generator);
 	    
+	    // Check Terminal State
+	    
+	    for (int i = 0; i < survivals.size(); i++) {
+	        if (env.obstacles[env.numObstacles + 1].isIn(*(survivals[i].set.end() - 1))) {
+	            output(survivals, env);
+	            cout << "exit\n";
+	            return 0;
+	        }
+	    }
+	    
 	    // Show
 	    
-	    if (t % 100 == 0) {
+	    if (t % 50 == 0) {
 	    
 	        //cerr << "[Debug] Before Show\n";	        
 	        
@@ -174,6 +188,8 @@ int main() {
 	    
        	   	imshow("map", image);
         	waitKey(0);
+        	
+        	output(survivals, env);
         }
 	}
 	

@@ -76,6 +76,7 @@ class Obstacle {
 		void set(int X, int Y, int Kind, int R, int A, int B);
 
 		bool isIn(int testX, int testY);
+		bool isIn(VectorPoint &v);
 		VectorPoint vectorForm();
 		
 		void drawObstacle(Mat &image);
@@ -122,7 +123,7 @@ class Environment {
 		const int width = 500;
 		const int height = 500;
 
-		int Map[500][500];		
+		int Map[600][600];		
 		
 		double s(double x) {
 			return x * x;

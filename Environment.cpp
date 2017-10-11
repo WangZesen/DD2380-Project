@@ -88,6 +88,23 @@ bool Obstacle::isIn(int testX, int testY) {
 	}
 }
 
+bool Obstacle::isIn(VectorPoint &v) {
+    int testX = v.x;
+    int testY = v.y;
+	switch (kind) {
+		case 1: {
+			if ((testX - x) * (testX - x) + (testY - y) * (testY - y) <= r * r)
+				return true;
+			return false;
+		}
+		case 0: {
+			if ((abs(testX - x) < a / 2.0) && (abs(testY - y) < b / 2.0)) 
+				return true;
+			return false;
+		}
+	}
+}
+
 VectorPoint Obstacle::vectorForm() {
     return VectorPoint(x, y);
 }
@@ -163,9 +180,9 @@ Environment::Environment(int mapset) {
         	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
         	break;
         case 2:
-        	obstacles.push_back(Obstacle(100, 100, 0, 0, 200, 50));
-        	obstacles.push_back(Obstacle(350, 200, 0, 0, 300, 50));
-        	obstacles.push_back(Obstacle(100, 300, 0, 0, 200, 50));
+        	obstacles.push_back(Obstacle(100, 100, 0, 0, 100, 50));
+        	obstacles.push_back(Obstacle(200, 200, 0, 0, 50, 100));
+        	obstacles.push_back(Obstacle(300, 300, 0, 0, 100, 50));
         	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
         	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
         	break;            
@@ -369,7 +386,7 @@ std::vector<VectorPoint> Environment::nextPropagation(const VectorPoint& x, cons
 	VectorPoint dir = x - y;
 	for (int i = 0; i < 360; i += 15) {
 		VectorPoint angle = x.calAngle(i, dist);
-		if ((angle.cosin(dir) >= 0.697106781) && (this->at(x + angle) != 2) && ((x + angle).x >= 0) && ((x + angle).y >= 0) && ((x + angle).x <= height) && ((x + angle).y <= width)) {
+		if ((angle.cosin(dir) >= 0.697106781) && (this->at(x + angle) != 2) && ((x + angle).x >= 0) && ((x + angle).y >= 0) && (int((x + angle).x) < height) && (int((x + angle).y) < width)) {
 			result.push_back(x + angle);
 		}
 	}
