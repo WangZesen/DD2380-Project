@@ -4,6 +4,8 @@
 using namespace cv;
 using namespace std;
 
+// Output Information for Visualization 
+
 void output(vector<Route> &survivals, Environment &env, int successIndex) {
 
     cout << "clear\n";
@@ -40,6 +42,8 @@ void output(vector<Route> &survivals, Environment &env, int successIndex) {
         cout << "endline\n";
     }
 }
+
+// Use Roulette Wheel Selection to Filter All Survivals
 
 void filter(vector<Route> &survivals, Environment &env, int survivalNum, Random &generator) {
     double sum = 0, min = 0x7fffffff, max = -0x7fffffff;
@@ -80,6 +84,9 @@ void filter(vector<Route> &survivals, Environment &env, int survivalNum, Random 
 
 int main() {
 
+    clock_t lastTime;
+    double timeCount = 0;
+    
 	Random generator;
 	generator.dist = uniform_real_distribution<double>(0.0, 1.0);
     generator.seed.seed(random_device{}());    
@@ -88,7 +95,14 @@ int main() {
 
     // Initial routes and maps
 
-    Environment env(5);
+    bool used[505][505];
+    for (int i = 0; i < 505; i++) {
+        for (int j = 0; j < 505; j++) {
+            used[i][j] = false;
+        }
+    }
+    
+    Environment env(mapNum);
     vector<Route> survivals;
 
 
@@ -103,14 +117,13 @@ int main() {
 
     VectorPoint startPoint = env.startPoint();	
     
-    const int gap = 4;
-    const int survivalNum = 100;
-    const int extendDist = 6;
-    const double hybridPro = 0.3;
+
     
     
-	for (int i = 0; i < 360; i += gap) {
-        survivals.push_back(Route(startPoint, startPoint + startPoint.calAngle(i, extendDist)));
+	for (int i = 0; i < 360; i += angleGap) {
+	    VectorPoint nextPoint = startPoint + startPoint.calAngle(i, extendDist);
+        survivals.push_back(Route(startPoint, nextPoint));
+        used[int(nextPoint.x)][int(nextPoint.y)] = true;
 	}
 	
 	filter(survivals, env, survivalNum, generator);
@@ -118,20 +131,24 @@ int main() {
     // Start of Genetic Algorithm	
     
 	for (int t = 0; t < 10000; t++) {
+
 	    int size = survivals.size();
-	    
-	    //cerr << "[Debug] Before Mutation, Size = " << size << "\n";
 	    
 	    // Mutation
 	    
 	    for (int i = 0; i < size; i++) {
+	        // Extending Mutation Method
             vector<Route> mutations = survivals[i].extendMutation(env, extendDist, generator);
             survivals.insert(survivals.end(), mutations.begin(), mutations.end());
+            // Shortening Mutation Method
             mutations = survivals[i].shortMutation(env, extendDist);
             survivals.insert(survivals.end(), mutations.begin(), mutations.end());
 	    }
 	    
-	    //cerr << "[Debug] Before Hybrid\n";	    
+	    for (int i = 0; i < survivals.size(); i++) {
+	        VectorPoint lastPoint = *(survivals[i].set.end() - 1);
+	        used[int(lastPoint.x)][int(lastPoint.y)] = true;
+	    }
 	    
 	    // Hybrid
 	    
@@ -144,27 +161,61 @@ int main() {
 	        }
 	    }
 	    
-	    //cerr << "[Debug] Before Filter\n";	    
-	    
 	    // Filter
 	    
 	    filter(survivals, env, survivalNum, generator);
 	    
-	    // Check Terminal State
+	    // Check Whether survivals reach end area
 	    
 	    for (int i = 0; i < survivals.size(); i++) {
 	        if (env.obstacles[env.numObstacles + 1].isIn(*(survivals[i].set.end() - 1))) {
 	            output(survivals, env, i);
 	            cout << "exit\n";
+	            
+	            cerr << "End with " << t << " generations\n";
+	            cerr << "Total Time: " << (timeCount + clock() - lastTime) / CLOCKS_PER_SEC << endl;
+	            
+	            
+	            int count = 0;
+	            for (int xi = 0; xi < 500; xi++) {
+	                for (int xj = 0; xj < 500; xj++) {
+	                    if (used[xi][xj])
+	                        count++;
+	                }
+	            }
+	            cerr << "# of Points Reached: " << count << " out of 250000 (" << count / 250000.0 << "%)\n";
+	            cerr << "Route Length: " << survivals[i].length() << endl;
+	            
+	            Mat image(500, 500, 6);
+	        
+    	        for (int i = 0; i < 500; i++) {
+    	            for (int j = 0; j < 500; j++) {
+    	                image.at<double>(i, j) = 0;
+    	            }
+    	        }
+	        
+	            for (int i = 0; i < env.numObstacles + 2; i++) {
+	                env.obstacles[i].drawObstacle(image);
+	            }
+
+        	    for (int i = 0; i < survivalNum; i++) {
+        	        survivals[i].drawRoute(image);
+        	    }
+	        
+           	   	imshow("map", image);
+            	waitKey(0);
+	                
 	            return 0;
 	        }
 	    }
 	    
-	    // Show
+	    // Visualization
 	    
-	    if (t % 50 == 0) {
+	    if ((t % 50 == 0) && (stepVisual)) {
 	    
-	        //cerr << "[Debug] Before Show\n";	        
+	        timeCount += clock() - lastTime;
+	    
+	        cerr << "# of Generation: " << t << ", Time Consumed: " << timeCount / CLOCKS_PER_SEC << endl;
 	        
 	        Mat image(500, 500, 6);
 	        
@@ -177,9 +228,7 @@ int main() {
 	        for (int i = 0; i < env.numObstacles + 2; i++) {
 	            env.obstacles[i].drawObstacle(image);
 	        }
-	    
-    	    
-	    
+
     	    for (int i = 0; i < survivalNum; i++) {
     	        survivals[i].drawRoute(image);
     	    }
@@ -188,11 +237,9 @@ int main() {
         	waitKey(0);
         	
         	output(survivals, env, -1);
+        	
+        	lastTime = clock();
         }
+        
 	}
-	
-	
-
-	
-
 }

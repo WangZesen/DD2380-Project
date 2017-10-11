@@ -13,6 +13,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "Parameter.hpp"
+
 #define PI 3.14159265359
 
 using namespace cv;
@@ -33,9 +35,13 @@ class VectorPoint {
 		//         |
 		//         |
 		//        270 
-		double length() const;
+		
 		double x, y;
-		void info();
+				
+		// Return the length of the vector
+		double length() const;
+		
+        // Constructor
 		VectorPoint(double initX, double initY);
 		VectorPoint();		
 		
@@ -59,6 +65,9 @@ class VectorPoint {
 		
 		// Gives a vector with angle and dist
 		VectorPoint calAngle(double angle, double dist) const;
+		
+        // Cerr the information of a vector (Debug)
+		void info();		
 };
 
 class Obstacle {
@@ -74,34 +83,36 @@ class Obstacle {
 		// a  |            | 
 		//    |            |
 		//    |____________|
-		//error: expected initializer before ‘switch’
+		//
 		// 1 = circle
 
+        // Constructor with some attributes
 		Obstacle();
-
 		Obstacle(int X, int Y, int Kind, int R, int A, int B);
 
+        // Set the values of attributes
 		void set(int X, int Y, int Kind, int R, int A, int B);
 
+        // Return true if point (testX, testY) is in this obstacle
 		bool isIn(int testX, int testY);
+		// Return true if point indicated by VectorPoint is in this obstacle
 		bool isIn(VectorPoint &v);
+		
+		// Return the position of this obstacle as a VectorPoint
 		VectorPoint vectorForm();
 		
+		// Visualization
 		void drawObstacle(Mat &image);
 };
 
 class Environment {
 	public:
-		// initial a map
+		// Initial a random map
 		Environment();
 		
+		// Initial a preset map
 		Environment(int mapset);
 
-		// Return map in string
-		std::string mapToString();
-
-		// Return map information
-		void mapInfo();
 
 		// Return the circustance on point (x, y)
 		// 0 = start area
@@ -117,32 +128,47 @@ class Environment {
 		// Param dist: propagation distance
 		std::vector<VectorPoint> nextPropagation(const VectorPoint& x, const VectorPoint& y, int dist);
 
+        // Calculate the closest point from a obstacle (#index)
 		VectorPoint closestPoint(const VectorPoint &c, int index);
+		
+		// Calculate the distance between a point (c) and a obstacle (#index)
 		double calDist(const VectorPoint &c, int index);
+		
+		// Calculate the potential at certain point
 		double potential(const VectorPoint& c);
+		
+		// Return true if no obstacles between point x and point y
         bool blocked(const VectorPoint& x, const VectorPoint& y);
 
-		const int numObstacles = 5;
-		std::vector<Obstacle> obstacles;
-		
+        // Return start point as a VectorPoint
         VectorPoint startPoint();
+        
+        // Return end point as a VectorPoint
 		VectorPoint endPoint();
+		
+		// Return map in string (Debug)
+		std::string mapToString();
+		
+		// Return map information (Debug)
+		void mapInfo();
+		
+		const int numObstacles = obstacleNum;
+		std::vector<Obstacle> obstacles;						
+		
 	private:
 		const int width = 500;
 		const int height = 500;
 
 		int Map[600][600];		
 		
-		double s(double x) {
+		
+		// Auxiliary functions
+		double s(double x) { // square
 			return x * x;
 		}
-		
-		double r(double x) {
+		double r(double x) { // square root
 			return sqrt(x);
 		}
-
-
-
 };
 
 

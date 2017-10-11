@@ -38,6 +38,14 @@ Route::Route(Route *r, VectorPoint &x) {
     set.push_back(x);
 }
 
+double Route::length() {
+    double sum = 0;
+    for (int i = 0; i < set.size() - 1; i++) {
+        sum += (set[i + 1] - set[i]).length();
+    }
+    return sum;
+}
+
 double Route::adaptability(VectorPoint &endPoint) {
     int len = set.size();
     for (int i = indexSum; i < len - 1; i++) {
