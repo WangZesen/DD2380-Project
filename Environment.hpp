@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string>
+#include <ctime>
+#include <random>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -14,6 +16,12 @@
 #define PI 3.14159265359
 
 using namespace cv;
+using namespace std;
+
+struct Random {
+    uniform_real_distribution<double> dist;
+    mt19937 seed;
+};
 
 class VectorPoint {
 		

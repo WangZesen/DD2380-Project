@@ -1,18 +1,10 @@
 #include "Environment.hpp"
 #include "Route.hpp"
 
-#include <ctime>
-#include <random>
-
 using namespace cv;
 using namespace std;
 
-struct Random {
-    uniform_real_distribution<double> dist;
-    mt19937 seed;
-};
-
-void output(vector<Route> &survivals, Environment &env) {
+void output(vector<Route> &survivals, Environment &env, int successIndex) {
 
     cout << "clear\n";
 
@@ -28,10 +20,20 @@ void output(vector<Route> &survivals, Environment &env) {
             min = (*iter).adaptability(endPoint);
     }
 
+    if (successIndex != -1) {
+        max += 100;
+    }
+
     vector<double> adapt;
     for (vector<Route>::iterator iter = survivals.begin(); iter != survivals.end(); iter++) {
         cout << "line\n";
-        cout << int(((*iter).adaptability(endPoint) - min) * 255 / (max - min)) << endl;
+        
+        if (iter - survivals.begin() != successIndex) {
+            cout << int(((*iter).adaptability(endPoint) - min) * 255 / (max - min)) << endl;
+        } else {
+            cout << int(((*iter).adaptability(endPoint) + 100 - min) * 255 / (max - min)) << endl;
+        }
+        
         for (int i = 0; i < (*iter).set.size(); i++) {
             cout << int((*iter).set[i].x) << " " << int((*iter).set[i].y) << endl; 
         }
@@ -82,11 +84,11 @@ int main() {
 	generator.dist = uniform_real_distribution<double>(0.0, 1.0);
     generator.seed.seed(random_device{}());    
     
-	// Algorithm starts here
+	
 
-    // Initial start routes
+    // Initial routes and maps
 
-    Environment env(1);
+    Environment env(5);
     vector<Route> survivals;
 
 
@@ -99,14 +101,12 @@ int main() {
         cout << env.obstacles[i].a << " " << env.obstacles[i].b << "\n";        
     }
 
-    //Mat image(500, 500, 6);
-
     VectorPoint startPoint = env.startPoint();	
     
-    const int gap = 3;
+    const int gap = 4;
     const int survivalNum = 100;
     const int extendDist = 6;
-    const double hybridPro = 0.2;
+    const double hybridPro = 0.3;
     
     
 	for (int i = 0; i < 360; i += gap) {
@@ -115,10 +115,8 @@ int main() {
 	
 	filter(survivals, env, survivalNum, generator);
 
-    //for (int i = 0; i < survivalNum; i++) {
-    //    survivals[i].drawRoute(image);
-	//}
     // Start of Genetic Algorithm	
+    
 	for (int t = 0; t < 10000; t++) {
 	    int size = survivals.size();
 	    
@@ -127,7 +125,7 @@ int main() {
 	    // Mutation
 	    
 	    for (int i = 0; i < size; i++) {
-            vector<Route> mutations = survivals[i].extendMutation(env, extendDist);
+            vector<Route> mutations = survivals[i].extendMutation(env, extendDist, generator);
             survivals.insert(survivals.end(), mutations.begin(), mutations.end());
             mutations = survivals[i].shortMutation(env, extendDist);
             survivals.insert(survivals.end(), mutations.begin(), mutations.end());
@@ -156,7 +154,7 @@ int main() {
 	    
 	    for (int i = 0; i < survivals.size(); i++) {
 	        if (env.obstacles[env.numObstacles + 1].isIn(*(survivals[i].set.end() - 1))) {
-	            output(survivals, env);
+	            output(survivals, env, i);
 	            cout << "exit\n";
 	            return 0;
 	        }
@@ -189,7 +187,7 @@ int main() {
        	   	imshow("map", image);
         	waitKey(0);
         	
-        	output(survivals, env);
+        	output(survivals, env, -1);
         }
 	}
 	

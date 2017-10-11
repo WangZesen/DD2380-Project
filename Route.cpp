@@ -21,7 +21,6 @@ Route::Route(std::vector<VectorPoint> &set1, VectorPoint &newPoint) {
 Route::Route(VectorPoint x, VectorPoint y) {
     set.push_back(x);
     set.push_back(y);
-    
     lengthSum = (x - y).length();
     indexSum = 1;
 }
@@ -75,7 +74,7 @@ std::vector<Route> Route::shortMutation(Environment& env, double dist) {
     return mutatedRoutes;
 }
 
-std::vector<Route> Route::extendMutation(Environment& env, double dist) {
+std::vector<Route> Route::extendMutation(Environment& env, double dist, Random &generator) {
     
     int len = set.size();
     std::vector<VectorPoint> result = env.nextPropagation(set[len - 1], set[len - 2], dist);
@@ -83,33 +82,69 @@ std::vector<Route> Route::extendMutation(Environment& env, double dist) {
     
     std::vector<Route> mutatedRoutes;
     
-    for (int i = 0; i < stateNum; i++) {
-        mutatedRoutes.push_back(Route(this, result[i]));
+    std::vector<double> accPro;
+    
+    if (APFOn == 0) {
+        for (int i = 0; i < stateNum; i++) {
+            accPro.push_back((i + 1) / double(stateNum));
+            //std::cerr << "[Debug] " << accPro[i];
+        }
+        //std::cerr << std::endl;
+    } else {
+        double min = 0x7fffffff, max = -0x7fffffff;
+        for (int i = 0; i < stateNum; i++) {
+            accPro.push_back(env.potential(result[i]));
+            if (accPro[i] > max) max = accPro[i];
+            if (accPro[i] < min) min = accPro[i];
+        }
+        
+        double sum = 0;
+        for (int i = 0; i < stateNum; i++) {
+            sum += max + min - accPro[i];
+            accPro[i] = sum;
+        }
+        for (int i = 0; i < stateNum; i++) {
+            accPro[i] /= sum;
+        }
     }
     
+    if (stateNum <= 5) {
+        for (int i = 0; i < stateNum; i++) {
+            mutatedRoutes.push_back(Route(this, result[i]));
+        }
+        return mutatedRoutes;
+    }
+    
+    for (int i = 0; i < 5; i++) {
+        double pro = generator.dist(generator.seed);
+        for (int j = 0; j < stateNum; j++) {
+            if (pro <= accPro[j]) {
+                mutatedRoutes.push_back(Route(this, result[j]));
+                break;
+            }
+        }
+    }
+
     return mutatedRoutes;
 }
 
 std::vector<Route> Route::hybrid(Route &route, Environment& env) {
 
-
     int len1 = set.size();
     int len2 = route.set.size();
-    
-
     
     if ((len1 < 50) || (len2 < 50))
         return std::vector<Route>();
 
     std::vector<Route> hybrids;
-    int index1, index2;    
+    int index1, index2;
     
     index1 = rand() % (len1 - 2) + 1;
     index2 = rand() % (len2 - 2) + 1;
     if ( ((set[index1] - set[index1 - 1]).cosin(route.set[index2] - set[index1]) >= 0.697106781) && ((route.set[index2 + 1] - route.set[index2]).cosin(route.set[index2] - set[index1]) >= 0.697106781) && (env.blocked(set[index1], route.set[index2]))) {
         hybrids.push_back(Route(set, route.set, index1, index2));
     }
-        
+    
     return hybrids;
 }
 

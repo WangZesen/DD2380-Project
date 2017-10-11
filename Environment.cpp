@@ -172,20 +172,41 @@ Environment::Environment() {
 
 Environment::Environment(int mapset) {
     switch(mapset) {
-        case 1:
+        case 1: // Normal
         	obstacles.push_back(Obstacle(100, 100, 0, 0, 200, 50));
         	obstacles.push_back(Obstacle(350, 200, 0, 0, 300, 50));
-        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
-        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
-        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
         	break;
-        case 2:
+        case 2: // Simple
         	obstacles.push_back(Obstacle(100, 100, 0, 0, 100, 50));
         	obstacles.push_back(Obstacle(200, 200, 0, 0, 50, 100));
         	obstacles.push_back(Obstacle(300, 300, 0, 0, 100, 50));
-        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
-        	obstacles.push_back(Obstacle(300, 200, 1, 1, 0, 0));
-        	break;            
+        	obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
+        	break;   
+        case 3: // Narrow (Hard) 
+        	obstacles.push_back(Obstacle(145, 0, 0, 0, 210, 920));
+        	obstacles.push_back(Obstacle(375, 500, 0, 0, 170, 920));
+        	obstacles.push_back(Obstacle(300, 300, 1, 0, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
+        	obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
+        	break;      
+        case 4: // Trap (Hard)
+            obstacles.push_back(Obstacle(300, 200, 0, 0, 50, 250));
+            obstacles.push_back(Obstacle(200, 300, 0, 0, 250, 50));
+            obstacles.push_back(Obstacle(450, 175, 0, 0, 100, 400));
+            obstacles.push_back(Obstacle(175, 450, 0, 0, 400, 100));
+            obstacles.push_back(Obstacle(300, 200, 1, 0, 0, 0));
+            break;
+        case 5: // Simple
+            obstacles.push_back(Obstacle(50, 325, 0, 0, 100, 400));
+            obstacles.push_back(Obstacle(325, 50, 0, 0, 400, 100));
+            obstacles.push_back(Obstacle(450, 175, 0, 0, 100, 400));
+            obstacles.push_back(Obstacle(175, 450, 0, 0, 400, 100));
+            obstacles.push_back(Obstacle(250, 250, 1, 50, 0, 0));
+            break;
     }
 	
 	Obstacle temp(20, 20, 0, 0, 20, 20);
@@ -366,8 +387,11 @@ double Environment::potential(const VectorPoint& c) {
 	double gamma = 2, k = 10, range = 5000, sum = 0;
 	VectorPoint totalForce(0, 0);
 	for (int i = 0; i < numObstacles; i++) {
-		double distance = calDist(c, i);
+		double distance = calDist(c, i) + 0.001;
 		double p = range / gamma * s(1 / distance - 1 / range);
+		
+		if ((obstacles[i].kind == 1) && (obstacles[i].r == 0))
+		    continue;
         sum += p;
 	}
     

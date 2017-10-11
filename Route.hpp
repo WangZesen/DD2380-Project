@@ -5,6 +5,8 @@
 
 using namespace cv;
 
+const int APFOn = 0;
+
 class Route {
     public:
         std::vector<VectorPoint> set;
@@ -15,7 +17,7 @@ class Route {
         Route(Route *r, VectorPoint &x);
         
         double adaptability(VectorPoint &endPoint);
-        std::vector<Route> extendMutation(Environment& env, double dist);
+        std::vector<Route> extendMutation(Environment& env, double dist, Random &generator);
         std::vector<Route> shortMutation(Environment& env, double dist);        
         std::vector<Route> hybrid(Route &route, Environment& env);
         
