@@ -23,3 +23,5 @@ Github Link:
     https://github.com/WangZesen/DD2380-Project/tree/APF
 
 ![solarized dualmode](https://github.com/WangZesen/DD2380-Project/blob/APF/sample.png)
+
+![solarized dualmode](https://github.com/WangZesen/DD2380-Project/blob/APF/sample1.png)
